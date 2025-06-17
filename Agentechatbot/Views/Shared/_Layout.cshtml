@@ -29,10 +29,11 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
+    <a href="#mainContent" class="visually-hidden-focusable focus-ring p-2">Saltar al contenido principal</a>
 
     <!-- ╔══ NAVBAR ══╗ -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm" aria-label="Main navigation">
             <div class="container-fluid">
                 <a asp-controller="Chat" asp-action="Index" class="navbar-brand fw-bold">
                     <i class="fa-solid fa-robot me-2"></i> AgenteChatbot
@@ -48,7 +49,7 @@
     </header>
 
     <!-- ╔══ CONTENIDO ══╗ -->
-    <main class="flex-fill py-4">
+    <main id="mainContent" class="flex-fill py-4">
         <div class="container">
             @RenderBody()
         </div>
