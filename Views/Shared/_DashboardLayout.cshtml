@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Dashboard Agente Chatbot</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Chatbot Dashboard</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="@(ViewContext.RouteData.Values["action"].ToString() == "Home" ? "active" : "")">
+                    <a asp-controller="Dashboard" asp-action="Home">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["action"].ToString() == "Chat" ? "active" : "")">
+                    <a asp-controller="Dashboard" asp-action="Chat">
+                        <i class="bi bi-chat-dots"></i> Chat
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["action"].ToString() == "Users" ? "active" : "")">
+                    <a asp-controller="Dashboard" asp-action="Users">
+                        <i class="bi bi-people"></i> Usuarios
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="top-bar">
+                <button id="toggle-sidebar" class="btn btn-sm">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="user-info">
+                    <span>Admin</span>
+                </div>
+            </div>
+            <div class="content-area">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#toggle-sidebar").click(function () {
+                $(".dashboard-container").toggleClass("sidebar-collapsed");
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

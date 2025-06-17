@@ -1,0 +1,228 @@
+/* === ESTILOS GLOBALES === */
+body {
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* === PANTALLA DE BIENVENIDA === */
+.welcome-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
+    padding: 2rem;
+}
+
+body.dark-theme .welcome-screen {
+    background: linear-gradient(135deg, #111827, #1f2937);
+}
+
+.welcome-container {
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: none;
+    transform: translateY(0);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-theme .welcome-container {
+    background-color: #1f2937;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-header {
+    background-color: white;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+body.dark-theme .welcome-header {
+    background-color: #1f2937;
+    border-bottom: 1px solid #374151;
+}
+
+.logo-container {
+    margin-bottom: 1.5rem;
+}
+
+.logo-avatar {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.15);
+}
+
+.welcome-form {
+    padding: 2rem;
+}
+
+.input-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.input-group-text {
+    border: none;
+    background-color: #f8f9fa;
+}
+
+body.dark-theme .input-group-text {
+    background-color: #374151;
+    color: #e5e7eb;
+    border: none;
+}
+
+.form-control {
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+.start-chat-btn {
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+    .start-chat-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+    }
+
+    .start-chat-btn:disabled {
+        opacity: 0.7;
+    }
+
+/* === CHAT CONTAINER === */
+.chat-container {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+body.dark-theme .chat-container {
+    background-color: var(--dark-bg);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.chat-messages {
+    background-color: #f5f7fa;
+    padding: 1.5rem !important;
+}
+
+body.dark-theme .chat-messages {
+    background-color: var(--dark-bg);
+}
+
+/* === ANIMACIONES === */
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.message {
+    animation: slideUp 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.chat-header, .chat-input {
+    animation: fadeIn 0.5s ease;
+}
+
+/* === MEJORAS DE ACCESIBILIDAD === */
+button, a, .form-control, .form-select {
+    transition: all 0.2s ease;
+}
+
+    button:focus, a:focus, .form-control:focus, .form-select:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 123, 255, 0.3);
+    }
+
+    .form-control::placeholder {
+        color: #9ca3af;
+    }
+
+body.dark-theme .form-control::placeholder {
+    color: #6b7280;
+}
+/* Añade este CSS a uno de tus archivos de tema o a styles.css */
+.typing-dots {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 18px;
+    width: fit-content;
+}
+
+body.dark-theme .typing-dots {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.typing-dots .dot {
+    height: 8px;
+    width: 8px;
+    margin: 0 4px;
+    background-color: #9ca3af;
+    border-radius: 50%;
+    display: inline-block;
+    animation: dot-flashing 1.5s infinite alternate;
+}
+
+    .typing-dots .dot:nth-child(2) {
+        animation-delay: 0.3s;
+    }
+
+    .typing-dots .dot:nth-child(3) {
+        animation-delay: 0.6s;
+    }
+
+@keyframes dot-flashing {
+    0% {
+        opacity: 0.2;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+    }
+}

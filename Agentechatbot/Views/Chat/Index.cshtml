@@ -1,0 +1,568 @@
+﻿@{
+    ViewData["Title"] = "Chat con Agente";
+    var agentName = TempData["agentName"]?.ToString() ?? "Usuario";
+    var sessionId = TempData["sessionId"]?.ToString() ?? Guid.NewGuid().ToString();
+}
+
+<!-- Tema CSS -->
+<link id="themeStylesheet" rel="stylesheet" href="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    /* Estilos personalizados para esta página */
+    .chat-wrapper {
+        max-width: 100%;
+        margin: 0 auto;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        height: 80vh;
+        background-color: var(--card-bg, #ffffff);
+        transition: all 0.3s ease;
+    }
+
+    .dark-theme .chat-wrapper {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .chat-header {
+        background: linear-gradient(135deg, var(--bs-primary) 0%, #4e73df 100%);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .agent-avatar {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .agent-avatar:hover {
+            transform: scale(1.05);
+        }
+
+    .chat-messages {
+        background-color: var(--body-bg, #f8f9fa);
+        padding: 1.5rem;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .dark-theme .chat-messages {
+        background-color: var(--body-bg, #1e1e2d);
+    }
+
+    .chat-input {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+    }
+
+    .dark-theme .chat-input {
+        background-color: var(--card-bg, #2b2b40);
+        border-top-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .input-group {
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        border-radius: 50px;
+        overflow: hidden;
+    }
+
+    .dark-theme .input-group {
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #messageInput {
+        border: none;
+        padding: 0.75rem 1.25rem;
+        background-color: var(--card-bg, #ffffff);
+        color: var(--text-color, #212529);
+        resize: none;
+    }
+
+    .dark-theme #messageInput {
+        background-color: var(--card-bg, #2b2b40);
+        color: var(--text-color, #e2e8f0);
+    }
+
+    #sendBtn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(var(--bs-primary-rgb), 0.2);
+        transition: all 0.3s ease;
+    }
+
+        #sendBtn:hover {
+            transform: scale(1.05);
+        }
+
+    /* Botones de acción */
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-left: 0.5rem;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+    /* Indicador de estado */
+    .status {
+        transition: all 0.3s ease;
+        padding: 0.25rem 0.75rem;
+    }
+
+    /* Indicador de escritura */
+    #typingIndicator {
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    /* Efecto de entrada para nuevos mensajes */
+    .message-new {
+        animation: fadeInUp 0.5s;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Estilo modal */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-theme .modal-content {
+        background-color: var(--card-bg, #2b2b40);
+        color: var(--text-color, #e2e8f0);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .dark-theme .modal-header {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .dark-theme .form-control,
+    .dark-theme .form-select {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-color, #e2e8f0);
+    }
+
+    /* Estilo para el badge de estado */
+    .badge.status {
+        border-radius: 50px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-color, #212529);
+    }
+
+    .dark-theme .page-title {
+        color: var(--text-color, #e2e8f0);
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+        color: var(--text-muted, #6c757d);
+    }
+
+    .dark-theme .page-subtitle {
+        color: var(--text-muted, #a0aec0);
+    }
+
+    /* Estilos para mensajes de archivos */
+    .file-bubble {
+        background-color: var(--card-bg, #ffffff);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .dark-theme .file-bubble {
+        background-color: var(--card-bg, #2b2b40);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .file-preview {
+        padding: 0.5rem;
+        border-radius: 8px;
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    .dark-theme .file-preview {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .file-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .file-name {
+        word-break: break-word;
+        max-width: 200px;
+    }
+    /* Estilos para el panel de archivos */
+    .file-panel {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dark-theme .file-panel {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .file-panel .card-body {
+        overflow-y: auto;
+        flex-grow: 1;
+    }
+
+    .file-item {
+        padding: 0.75rem 1rem;
+        border-left: none;
+        border-right: none;
+        transition: all 0.2s ease;
+    }
+
+        .file-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            transform: translateX(3px);
+        }
+
+    .dark-theme .file-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .file-icon {
+        width: 32px;
+        text-align: center;
+        margin-right: 10px;
+    }
+
+    .file-name {
+        font-weight: 500;
+        word-break: break-word;
+    }
+
+    .file-meta {
+        font-size: 0.8rem;
+        color: var(--text-muted, #6c757d);
+    }
+
+    .dark-theme .file-meta {
+        color: var(--text-muted, #a0aec0);
+    }
+
+    .file-actions {
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+    }
+
+    .file-item:hover .file-actions {
+        opacity: 1;
+    }
+</style>
+
+<!-- Contenedor principal con layout de columnas -->
+<div class="container-fluid px-4">
+    <div class="row">
+        <!-- Columna del chat (70% en pantallas medianas y grandes) -->
+        <div class="col-md-8">
+            <!-- Cabecera de página -->
+            <div class="page-header animate__animated animate__fadeIn">
+                <h1 class="page-title">Centro de Chat</h1>
+                <p class="page-subtitle">
+                    Estás chateando como <span class="fw-bold">@agentName</span> en la sesión
+                    <span class="text-primary fw-bold">
+                        @{
+                            // Convertir sessionId a string y obtener los primeros 8 caracteres (o menos si es más corto)
+                            string sessionIdStr = sessionId?.ToString() ?? "";
+                            string displaySessionId = sessionIdStr.Length > 8 ? sessionIdStr.Substring(0, 8) : sessionIdStr;
+                        }
+                        @displaySessionId
+                    </span>
+                </p>
+            </div>
+
+            <!-- ───── Contenedor del chat ───── -->
+            <div id="chatContainer" class="chat-wrapper d-flex flex-column animate__animated animate__fadeIn animate__delay-1s">
+                <!-- Header -->
+                <header class="chat-header text-white">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="agent-avatar bg-white text-primary rounded-circle me-3">
+                                <i class="fa-solid fa-user-headset"></i>
+                            </div>
+                            <div>
+                                <h5 id="agentDisplayName" class="mb-0 fw-bold">@agentName</h5>
+                                <small id="connectionStatus" class="status badge bg-danger">🔴 Desconectado</small>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <button id="themeToggleBtn" class="action-btn" title="Cambiar tema">
+                                <i class="fa-solid fa-moon"></i>
+                            </button>
+                            <button id="clearChat" class="action-btn" title="Limpiar chat">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <a href="@Url.Action("Welcome", "Chat")" class="action-btn" title="Salir">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </a>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Mensajes -->
+                <main id="chatMessages" class="chat-messages flex-grow-1 overflow-auto">
+                    <!-- Mensaje inicial de bienvenida -->
+                    <div class="message whatsapp-agent mb-3 d-flex message-new">
+                        <div>
+                            <p>¡Hola @agentName! Soy tu asistente AI. ¿En qué puedo ayudarte hoy?</p>
+                            <span class="message-time">Ahora</span>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Entrada de mensaje -->
+                <footer class="chat-input bg-light">
+                    <div class="input-group">
+                        <textarea id="messageInput" class="form-control" rows="1" placeholder="Escribe tu mensaje aquí…"></textarea>
+                        <button id="sendBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+        <!-- Columna de archivos (30% en pantallas medianas y grandes) -->
+        <div class="col-md-4 mt-4 mt-md-0">
+            <div class="file-panel card animate__animated animate__fadeIn animate__delay-1s">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fa-solid fa-folder-open me-2"></i>Archivos de la sesión</h5>
+                        <button id="refreshFilesBtn" class="btn btn-sm btn-light" title="Actualizar lista">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="filesList" class="list-group list-group-flush">
+                        <!-- Los archivos se cargarán aquí dinámicamente -->
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-spinner fa-spin mb-2"></i>
+                            <p>Cargando archivos...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Mostrando archivos de la sesión: @displaySessionId</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de ajustes -->
+<div id="settingsModal" class="settings-modal modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajustes</h5>
+                <button id="closeModal" type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group mb-3">
+                    <label for="nameInput" class="form-label">Nombre de agente</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        <input id="nameInput" type="text" class="form-control" value="@agentName" />
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="themeSelect" class="form-label">Tema</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-palette"></i></span>
+                        <select id="themeSelect" class="form-select">
+                            <option value="dark">Oscuro</option>
+                            <option value="light">Claro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="form-label d-block">Notificaciones</label>
+                    <div class="form-check form-switch">
+                        <input id="soundToggle" class="form-check-input" type="checkbox" role="switch" />
+                        <label for="soundToggle" class="form-check-label">Sonido</label>
+                    </div>
+                </div>
+
+                <!-- Nuevo toggle para archivos -->
+                <div class="form-group mb-3">
+                    <label class="form-label d-block">Archivos</label>
+                    <div class="form-check form-switch">
+                        <input id="filesToggle" class="form-check-input" type="checkbox" role="switch" checked />
+                        <label for="filesToggle" class="form-check-label">Recibir archivos de usuarios</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSettingsBtn" class="btn btn-primary w-100">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notificaciones Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="notificationToast" class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fa-solid fa-bell me-2"></i>
+                <span id="toastMessage">Nuevo mensaje recibido</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Variables de sesión para JavaScript -->
+<script>
+    // Almacenar los datos del usuario para el chat
+    const USER_DATA = {
+        name: "@agentName",
+        sessionId: "@sessionId"
+    };
+</script>
+
+<!-- Scripts para manejo de temas -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para establecer el tema
+        function setTheme(theme) {
+            const body = document.body;
+            const themeStylesheet = document.getElementById('themeStylesheet');
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+                themeStylesheet.href = '/css/dark-theme.css';
+            } else {
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+                themeStylesheet.href = '/css/light-theme.css';
+            }
+
+            localStorage.setItem('preferred-theme', theme);
+        }
+
+        // Cargar tema preferido
+        const savedTheme = localStorage.getItem('preferred-theme') || 'light';
+        setTheme(savedTheme);
+
+        // Botón para cambiar tema
+        document.getElementById('themeToggleBtn').addEventListener('click', function() {
+            const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            // Añadir animación al botón
+            this.classList.add('animate__animated', 'animate__rubberBand');
+            setTimeout(() => {
+                this.classList.remove('animate__animated', 'animate__rubberBand');
+            }, 1000);
+
+            setTheme(newTheme);
+        });
+
+        // Conectar el selector de temas en el modal
+        document.getElementById('themeSelect').value = savedTheme;
+        document.getElementById('themeSelect').addEventListener('change', function() {
+            setTheme(this.value);
+        });
+
+        // Auto-expandir el textarea al escribir
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput) {
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+                if (this.scrollHeight > 150) {
+                    this.style.height = '150px';
+                    this.style.overflowY = 'auto';
+                } else {
+                    this.style.overflowY = 'hidden';
+                }
+            });
+        }
+
+        // Añadir efecto de hover a los mensajes
+        document.querySelectorAll('.message').forEach(msg => {
+            msg.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(3px)';
+            });
+            msg.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    });
+</script>

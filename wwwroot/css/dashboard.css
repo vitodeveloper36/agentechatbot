@@ -1,0 +1,97 @@
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background-color: #212529;
+}
+
+.sidebar-menu {
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-menu li {
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.sidebar-menu li:hover, .sidebar-menu li.active {
+    background-color: #495057;
+}
+
+.sidebar-menu a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar-menu i {
+    margin-right: 10px;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.content-area {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-collapsed .sidebar {
+    width: 70px;
+}
+
+.sidebar-collapsed .sidebar-header h3,
+.sidebar-collapsed .sidebar-menu li span {
+    display: none;
+}
+
+.sidebar-collapsed .sidebar-menu li {
+    text-align: center;
+    padding: 10px;
+}
+
+.sidebar-collapsed .sidebar-menu i {
+    margin-right: 0;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        position: relative;
+    }
+    
+    .sidebar {
+        position: absolute;
+        height: 100%;
+        z-index: 1000;
+        left: -250px;
+    }
+    
+    .sidebar-collapsed .sidebar {
+        left: 0;
+    }
+}

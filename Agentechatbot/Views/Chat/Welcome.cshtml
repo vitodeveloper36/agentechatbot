@@ -1,0 +1,742 @@
+﻿@model List<Agentechatbot.Models.ChatSession>
+@{
+    ViewData["Title"] = "Bienvenido al Chat";
+}
+
+<!-- Tema CSS y estilos adicionales -->
+<link id="themeStylesheet" rel="stylesheet" href="" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    /* Reset del contenedor principal para eliminar padding por defecto */
+    main.flex-fill > .container {
+        padding: 0;
+        max-width: 100%;
+        height: 100%;
+    }
+
+    .welcome-screen {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        /* Aseguramos que ocupe exactamente el espacio disponible */
+        height: calc(100vh - 56px - 49px); /* Altura total menos navbar y footer */
+        margin: -1.5rem 0; /* Compensar el padding del main */
+        overflow: hidden;
+        padding: 1rem;
+    }
+
+    .dark-theme .welcome-screen {
+        background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    }
+
+    .welcome-container {
+        max-width: 420px;
+        width: 100%;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        transform: translateY(0);
+        transition: all 0.3s ease;
+        margin-right: 2.5rem; /* Aumentado de 1rem a 2.5rem para mayor separación */
+    }
+
+    .sessions-container {
+        width: 100%;
+        max-width: 650px;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        background: white;
+        animation-delay: 0.5s;
+        margin-left: 0.5rem; /* Añadido pequeño margen izquierdo */
+    }
+
+    .dark-theme .sessions-container {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+
+    .sessions-header {
+        background: linear-gradient(135deg, #0061f2 0%, #6610f2 100%);
+        padding: 1rem;
+        color: white;
+        font-weight: 600;
+    }
+
+    .sessions-body {
+        padding: 0;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .welcome-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .welcome-header {
+        background: linear-gradient(135deg, #0061f2 0%, #6610f2 100%);
+        padding: 1.25rem 1.25rem;
+        border-bottom: none;
+        position: relative;
+    }
+
+    .logo-container {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .logo-avatar {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        position: relative;
+        z-index: 1;
+        border: 3px solid rgba(255,255,255,0.2);
+        transition: all 0.3s ease;
+    }
+
+        .logo-avatar:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .logo-avatar i {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            font-size: 1.5rem !important;
+        }
+
+    .welcome-header h1 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        font-size: 1.7rem;
+    }
+
+    .welcome-header p {
+        color: rgba(255,255,255,0.9);
+        font-size: 0.9rem;
+        max-width: 90%;
+        margin: 0 auto;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .welcome-form {
+        padding: 1.25rem;
+        background: white;
+    }
+
+    .dark-theme .welcome-form {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .input-group {
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .input-group:focus-within {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: none;
+        color: #6c757d;
+        padding-left: 1rem;
+    }
+
+    .dark-theme .input-group-text {
+        background-color: #4a5568;
+        color: #cbd5e0;
+    }
+
+    .form-control {
+        border: none;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .dark-theme .form-control {
+        background-color: #2d3748;
+        color: white;
+    }
+
+        .dark-theme .form-control::placeholder {
+            color: #a0aec0;
+        }
+
+    .form-group {
+        margin-bottom: 0.9rem !important;
+    }
+
+    .start-chat-btn {
+        padding: 0.65rem 1.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0061f2 0%, #6610f2 100%);
+        border: none;
+        box-shadow: 0 5px 15px rgba(0,97,242,0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .start-chat-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .start-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,97,242,0.4);
+        }
+
+            .start-chat-btn:hover::after {
+                transform: translateX(100%);
+            }
+
+        .start-chat-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+    /* Tabla de sesiones */
+    .table-sessions {
+        margin-bottom: 0;
+    }
+
+        .table-sessions th {
+            background-color: rgba(0, 0, 0, 0.03);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .table-sessions td {
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+    .session-badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+    }
+
+        .session-badge.active {
+            background-color: #10b981;
+        }
+
+        .session-badge.closed {
+            background-color: #6c757d;
+        }
+
+    .action-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 4px;
+    }
+
+    /* Burbujas de fondo animadas - versión optimizada */
+    .bubbles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+        top: 0;
+        left: 0;
+    }
+
+    .bubble {
+        position: absolute;
+        bottom: -50px;
+        width: 25px;
+        height: 25px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        opacity: 0.5;
+        animation: rise 10s infinite ease-in;
+    }
+
+        .bubble:nth-child(1) {
+            width: 25px;
+            height: 25px;
+            left: 10%;
+            animation-duration: 8s;
+        }
+
+        .bubble:nth-child(2) {
+            width: 15px;
+            height: 15px;
+            left: 20%;
+            animation-duration: 5s;
+            animation-delay: 1s;
+        }
+
+        .bubble:nth-child(3) {
+            width: 30px;
+            height: 30px;
+            left: 35%;
+            animation-duration: 7s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(4) {
+            width: 50px;
+            height: 50px;
+            left: 50%;
+            animation-duration: 11s;
+            animation-delay: 0s;
+        }
+
+        .bubble:nth-child(5) {
+            width: 20px;
+            height: 20px;
+            left: 55%;
+            animation-duration: 6s;
+            animation-delay: 1s;
+        }
+
+        .bubble:nth-child(6) {
+            width: 30px;
+            height: 30px;
+            left: 65%;
+            animation-duration: 8s;
+            animation-delay: 3s;
+        }
+
+        .bubble:nth-child(7) {
+            width: 55px;
+            height: 55px;
+            left: 70%;
+            animation-duration: 12s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(8) {
+            width: 15px;
+            height: 15px;
+            left: 80%;
+            animation-duration: 6s;
+            animation-delay: 2s;
+        }
+
+    @@keyframes rise {
+        0%
+
+    {
+        bottom: -50px;
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(50px);
+    }
+
+    100% {
+        bottom: 100%;
+        transform: translateX(-50px);
+    }
+
+    }
+
+    /* Responsive */
+    .welcome-screen-row {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 1200px;
+        justify-content: center;
+        gap: 2rem; /* Añadido gap para separación consistente */
+    }
+
+    .welcome-col {
+        flex: 0 0 auto;
+    }
+
+    .welcome-col-form {
+        width: 420px;
+    }
+
+    .welcome-col-sessions {
+        width: 650px;
+    }
+
+    @@media (max-width: 1100px) {
+        .welcome-screen-row
+
+    {
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem; /* Mantener gap en móvil */
+    }
+
+    .welcome-container {
+        margin-right: 0; /* Eliminar margen derecho en móvil */
+        margin-bottom: 0; /* Eliminado porque usamos gap */
+    }
+
+    .sessions-container {
+        margin-top: 0; /* Eliminado porque usamos gap */
+        margin-left: 0; /* Eliminar margen izquierdo en móvil */
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .sessions-body {
+        max-height: 250px;
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        .welcome-container
+
+    {
+        margin: 0.5rem;
+    }
+
+    .welcome-header {
+        padding: 1rem 0.75rem;
+    }
+
+        .welcome-header h1 {
+            font-size: 1.4rem;
+        }
+
+    .welcome-form {
+        padding: 1rem;
+    }
+
+    .logo-avatar {
+        width: 50px;
+        height: 50px;
+    }
+
+    .sessions-container {
+        width: 95%;
+    }
+
+    }
+
+    /* Para pantallas muy pequeñas en altura */
+    @@media (max-height: 700px) {
+        .welcome-screen
+
+    {
+        height: auto;
+        min-height: calc(100vh - 56px - 49px);
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    }
+
+    @@media (max-height: 520px) {
+        .logo-avatar
+
+    {
+        width: 40px;
+        height: 40px;
+    }
+
+    .logo-avatar i {
+        font-size: 1.2rem !important;
+    }
+
+    .logo-container {
+        margin-bottom: 0.3rem !important;
+    }
+
+    .welcome-header {
+        padding: 0.75rem;
+    }
+
+        .welcome-header h1 {
+            font-size: 1.3rem;
+        }
+
+        .welcome-header p {
+            font-size: 0.8rem;
+        }
+
+    .welcome-form {
+        padding: 0.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.6rem !important;
+    }
+
+    .form-control {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .input-group-text {
+        padding-left: 0.75rem;
+    }
+
+    small.text-muted {
+        display: none !important;
+    }
+
+    }
+</style>
+
+<!-- ───── Pantalla de bienvenida ───── -->
+<div class="welcome-screen">
+    <div class="welcome-screen-row">
+        <!-- Columna del formulario de bienvenida -->
+        <div class="welcome-col welcome-col-form">
+            <div class="welcome-container card animate__animated animate__fadeIn">
+                <header class="welcome-header card-header text-center">
+                    <!-- Burbujas animadas -->
+                    <div class="bubbles">
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                        <div class="bubble"></div>
+                    </div>
+
+                    <div class="logo-container mb-3">
+                        <div class="logo-avatar rounded-circle bg-primary text-white animate__animated animate__bounceIn">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                    </div>
+                    <h1 class="animate__animated animate__fadeInUp animate__delay-1s">¡Bienvenido!</h1>
+                    <p class="animate__animated animate__fadeInUp animate__delay-1s">Ingresa tu nombre para comenzar a chatear.</p>
+                </header>
+
+                <div class="welcome-form card-body animate__animated animate__fadeIn animate__delay-2s">
+                    <form id="welcomeForm" method="post" action="@Url.Action("Index", "Chat")">
+                        <div class="form-group mb-3">
+                            <label for="agentName" class="form-label">Tu nombre</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                <input id="agentName" name="agentName" type="text" class="form-control"
+                                       placeholder="Ej: Víctor" required autocomplete="name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="sessionId" class="form-label">Session ID</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                <input id="sessionId" name="sessionId" type="text" class="form-control"
+                                       placeholder="Déjalo vacío para autogenerar" />
+                            </div>
+                            <small class="text-muted mt-1 d-block">Un identificador único para tu sesión de chat.</small>
+                        </div>
+
+                        <button type="submit" id="startChatBtn" class="start-chat-btn btn btn-primary w-100 py-2 mt-2">
+                            Iniciar chat <i class="fa-solid fa-arrow-right-long ms-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna de la tabla de sesiones -->
+        <!-- Columna de la tabla de sesiones -->
+        <div class="welcome-col welcome-col-sessions">
+            <div class="sessions-container card animate__animated animate__fadeIn animate__delay-1s">
+                <div class="sessions-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 animate__animated animate__fadeInUp animate__delay-2s">
+                            <i class="fa-solid fa-list-check me-2"></i>Sesiones disponibles
+                        </h5>
+                        <button id="refreshSessionsBtn" class="btn btn-sm btn-light animate__animated animate__fadeIn animate__delay-3s">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="sessions-body animate__animated animate__fadeIn animate__delay-2s">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sessions">
+                            <thead class="animate__animated animate__fadeInUp animate__delay-2s">
+                                <tr>
+                                    <th>Session ID</th>
+                                    <th>Usuario</th>
+                                    <th>Inicio</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sessionsTableBody">
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var session in Model)
+                                    {
+                                        <tr class="animate__animated animate__fadeInUp animate__delay-3s">
+                                            <td>@session.SessionId</td>
+                                            <td>@session.Usuario</td>
+                                            <td>@session.StartedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                @if (session.IsClosed)
+                                                {
+                                                    <span class="badge session-badge closed">Cerrada</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge session-badge active">Activa</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm action-btn join-session-btn"
+                                                        data-session-id="@session.SessionId"
+                                                        data-user="@session.Usuario">
+                                                    Unirse
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr class="animate__animated animate__fadeIn animate__delay-2s">
+                                        <td colspan="5" class="text-center py-3">No hay sesiones disponibles</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Scripts para manejo de temas y animaciones -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validar formulario
+        const agentNameInput = document.getElementById('agentName');
+        const sessionIdInput = document.getElementById('sessionId');
+        const startChatBtn = document.getElementById('startChatBtn');
+
+        // Aplicar autofocus con un pequeño retraso para permitir la animación
+        setTimeout(() => {
+            agentNameInput.focus();
+        }, 1500);
+
+        agentNameInput.addEventListener('input', function() {
+            const isEmpty = this.value.trim() === '';
+            startChatBtn.disabled = isEmpty;
+
+            if (isEmpty) {
+                startChatBtn.classList.remove('animate__animated', 'animate__pulse');
+            } else if (!startChatBtn.classList.contains('animate__animated')) {
+                startChatBtn.classList.add('animate__animated', 'animate__pulse');
+            }
+        });
+
+        // Inicialmente desactivar el botón si no hay nombre
+        startChatBtn.disabled = agentNameInput.value.trim() === '';
+
+        // Añadir efecto de pulsación al botón cuando el formulario es válido
+        agentNameInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter' && this.value.trim() !== '') {
+                document.getElementById('welcomeForm').submit();
+            }
+        });
+
+        // Unirse a una sesión existente
+        document.querySelectorAll('.join-session-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const sessionId = this.getAttribute('data-session-id');
+                const user = this.getAttribute('data-user');
+
+                // Asignar el sessionId al campo de entrada
+                sessionIdInput.value = sessionId;
+
+                // Si no hay nombre de usuario, usar el de la sesión
+                if (agentNameInput.value.trim() === '') {
+                    agentNameInput.value = user;
+                }
+
+                // Activar el botón
+                startChatBtn.disabled = false;
+
+                // Resaltar visualmente
+                sessionIdInput.classList.add('is-valid');
+
+                // Hacer scroll al formulario en móviles
+                if (window.innerWidth < 1100) {
+                    document.querySelector('.welcome-container').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Recargar sesiones
+        document.getElementById('refreshSessionsBtn').addEventListener('click', function() {
+            this.disabled = true;
+            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            // Recargar la página
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        });
+
+        // Función para establecer el tema
+        function setTheme(theme) {
+            const body = document.body;
+            const themeStylesheet = document.getElementById('themeStylesheet');
+
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+                themeStylesheet.href = '/css/dark-theme.css';
+            } else {
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                themeStylesheet.href = '/css/light-theme.css';
+            }
+
+            localStorage.setItem('preferred-theme', theme);
+        }
+
+        // Cargar tema preferido
+        const savedTheme = localStorage.getItem('preferred-theme') || 'light';
+        setTheme(savedTheme);
+
+        // Aplicar animación al enviar el formulario
+        document.getElementById('welcomeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (agentNameInput.value.trim() !== '') {
+                const container = document.querySelector('.welcome-container');
+                container.classList.add('animate__animated', 'animate__fadeOutUp');
+
+                setTimeout(() => {
+                    this.submit();
+                }, 800);
+            }
+        });
+    });
+</script>
